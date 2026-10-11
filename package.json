@@ -1,0 +1,22 @@
+{
+  "name": "lumina-commerce",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lumina Commerce - Full-stack e-commerce application",
+  "scripts": {
+    "dev": "concurrently --names \"CLIENT,SERVER\" --prefix-colors \"cyan,yellow\" \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build:client": "cd client && npm run build",
+    "install:all": "cd client && npm install && cd ../server && npm install",
+    "start:server": "cd server && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "embla-carousel-autoplay": "^8.6.0",
+    "nginx": "^1.1.0",
+    "pm2": "^7.0.1"
+  }
+}

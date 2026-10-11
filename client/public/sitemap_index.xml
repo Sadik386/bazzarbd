@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Static pages sitemap -->
+  <sitemap>
+    <loc>https://thelagari.com/sitemap.xml</loc>
+    <lastmod>2026-06-03</lastmod>
+  </sitemap>
+
+  <!-- Dynamic product pages sitemap (served by Express API) -->
+  <sitemap>
+    <loc>https://thelagari.com/sitemap-products.xml</loc>
+    <lastmod>2026-06-03</lastmod>
+  </sitemap>
+
+</sitemapindex>

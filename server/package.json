@@ -1,0 +1,42 @@
+{
+  "name": "lumina-commerce-server",
+  "version": "1.0.0",
+  "description": "Lumina Commerce Backend API",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "seed": "node seed.js",
+    "test-cloudinary": "node test-cloudinary.js",
+    "migrate:images": "node scripts/migrateImages.js",
+    "migrate:images:dry": "node scripts/migrateImages.js --dry-run"
+  },
+  "keywords": [
+    "ecommerce",
+    "api",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.15.2",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.3",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.1",
+    "firebase-admin": "^13.8.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.12.1",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^8.0.7",
+    "pdfkit": "^0.18.0",
+    "resend": "^6.12.3"
+  }
+}

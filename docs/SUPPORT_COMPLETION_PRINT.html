@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thelagari — 120-Day Support Completion Certificate</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1f2937;
+      background: #f9fafb;
+      line-height: 1.4;
+      font-size: 13px;
+    }
+    .page-container {
+      max-width: 800px;
+      min-width: 650px;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 35px 40px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    @media print {
+      body {
+        background: #ffffff;
+      }
+      .page-container {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+        max-width: 100%;
+      }
+      .no-print {
+        display: none;
+      }
+    }
+    .header-box {
+      border-left: 5px solid #d4a574;
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-left: 5px solid #d4a574;
+      padding: 16px 20px;
+      border-radius: 6px;
+      margin-bottom: 22px;
+    }
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #111827;
+    }
+    .sub-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #b45309;
+      text-transform: uppercase;
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+    .meta-line {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+    h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      margin: 18px 0 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+      padding-bottom: 4px;
+    }
+    p {
+      color: #4b5563;
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: justify;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      margin-bottom: 12px;
+      font-size: 11.5px;
+      table-layout: fixed;
+    }
+    th {
+      background: #f3f4f6;
+      text-align: left;
+      padding: 8px 10px;
+      font-weight: 700;
+      color: #111827;
+      border: 1px solid #e5e7eb;
+      word-break: normal;
+      hyphens: none;
+    }
+    td {
+      padding: 8px 10px;
+      border: 1px solid #e5e7eb;
+      color: #374151;
+      vertical-align: middle;
+      word-break: normal;
+      hyphens: none;
+    }
+    th:nth-child(1), td:nth-child(1) {
+      width: 30%;
+    }
+    th:nth-child(2), td:nth-child(2) {
+      width: 25%;
+    }
+    th:nth-child(3), td:nth-child(3) {
+      width: 28%;
+    }
+    th:nth-child(4), td:nth-child(4) {
+      width: 17%;
+      text-align: center;
+    }
+    tr:nth-child(even) td {
+      background: #fafafa;
+    }
+    .badge-success {
+      display: inline-block;
+      font-weight: 700;
+      color: #15803d;
+      background: #dcfce7;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10.5px;
+    }
+    ul.check-list {
+      list-style: none;
+      margin-top: 6px;
+    }
+    ul.check-list li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 5px;
+      font-size: 12px;
+      color: #4b5563;
+    }
+    ul.check-list li::before {
+      content: "✔";
+      position: absolute;
+      left: 0;
+      color: #d4a574;
+      font-weight: bold;
+    }
+    .sign-section {
+      display: flex;
+      gap: 20px;
+      margin-top: 22px;
+    }
+    .sign-box {
+      flex: 1;
+      border: 1px solid #e5e7eb;
+      background: #fafafa;
+      padding: 14px 16px;
+      border-radius: 6px;
+    }
+    .sign-box-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #b45309;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+    }
+    .sign-row {
+      font-size: 11.5px;
+      color: #4b5563;
+      margin-bottom: 10px;
+      border-bottom: 1px dotted #d1d5db;
+      padding-bottom: 2px;
+    }
+    .footer-note {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 10px;
+      color: #9ca3af;
+    }
+    .print-btn {
+      display: inline-block;
+      margin-bottom: 15px;
+      background: #d4a574;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      border: none;
+    }
+    .print-btn:hover {
+      background: #b45309;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-container">
+    <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <span style="font-size: 12px; color: #6b7280;">Printable & PDF View — Use Ctrl+P or the button to save as PDF</span>
+      <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    </div>
+
+    <!-- Header Box -->
+    <div class="header-box">
+      <div class="brand-title">THELAGARI (LUMINA COMMERCE)</div>
+      <div class="sub-title">120-Day Support Completion & Final Sign-Off Certificate</div>
+      <div class="meta-line">
+        <strong>Production URL:</strong> https://thelagaribd.com &nbsp;|&nbsp; 
+        <strong>Version:</strong> v1.0.0-production &nbsp;|&nbsp; 
+        <strong>Issue Date:</strong> October 2026
+      </div>
+    </div>
+
+    <!-- Section 1 -->
+    <h2>1. Executive Support Fulfillment Declaration</h2>
+    <p>
+      This document certifies that the comprehensive <strong>120-Day Post-Launch Support & Warranty Period</strong> for the 
+      Thelagari E-Commerce platform has been fully completed and executed in accordance with agreed specifications. 
+      All in-scope software defect remediation, performance optimizations, and infrastructure resilience tasks have been 
+      successfully concluded. There are currently zero outstanding Critical (P1) or Major (P2) platform blockers.
+    </p>
+
+    <!-- Section 2 -->
+    <h2>2. Support SLA & Performance Summary</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Deliverable / Dimension</th>
+          <th>Agreed Target</th>
+          <th>Delivered Result</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Support Window</strong></td>
+          <td>120 Calendar Days</td>
+          <td>120 Days Dedicated Coverage</td>
+          <td><span class="badge-success">Completed</span></td>
+        </tr>
+        <tr>
+          <td><strong>Critical Defect SLA (P1)</strong></td>
+          <td>&lt; 8 Hours Target Resolution</td>
+          <td>0 Unresolved Critical Defects</td>
+          <td><span class="badge-success">100% Resolved</span></td>
+        </tr>
+        <tr>
+          <td><strong>Major Defect SLA (P2)</strong></td>
+          <td>&lt; 24 Hours Target Resolution</td>
+          <td>All Functional Tickets Closed</td>
+          <td><span class="badge-success">100% Resolved</span></td>
+        </tr>
+        <tr>
+          <td><strong>Platform Availability</strong></td>
+          <td>Storefront & VPS Availability</td>
+          <td>&gt; 99.9% Production Uptime</td>
+          <td><span class="badge-success">Exceeded</span></td>
+        </tr>
+        <tr>
+          <td><strong>Automated Database Backups</strong></td>
+          <td>Nightly MongoDB dumps</td>
+          <td>Google Drive Rclone Automation Active</td>
+          <td><span class="badge-success">Operational</span></td>
+        </tr>
+        <tr>
+          <td><strong>Full Codebase Ownership</strong></td>
+          <td>Monorepo Ownership & Keys</td>
+          <td>Admin Rights Handed Over to Client</td>
+          <td><span class="badge-success">Completed</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Section 3 -->
+    <h2>3. Production Systems Handed Over & Verified</h2>
+    <ul class="check-list">
+      <li><strong>Storefront & Checkout:</strong> React 18, Vite & Tailwind responsive shopping experience live at <a href="https://thelagaribd.com" target="_blank">thelagaribd.com</a>.</li>
+      <li><strong>API & Backend Runtime:</strong> Node.js / Express API running under PM2 cluster mode with automated reboot recovery.</li>
+      <li><strong>Database & Disaster Recovery:</strong> MongoDB cluster with verified daily backup script (<code>backup_to_gdrive.sh</code>).</li>
+      <li><strong>Cloud Integrations:</strong> Cloudinary media CDN, Resend transactional emails, and payment gateway callbacks operating normally.</li>
+    </ul>
+
+    <!-- Section 4 -->
+    <h2>4. Transition to Ongoing Operations</h2>
+    <p>
+      Upon signature of this certificate, the complimentary 120-day warranty window concludes and the platform 
+      transitions to Client Self-Management. The delivery team is formally discharged from complimentary support obligations. 
+      Subsequent feature engineering or retainer-based maintenance may be contracted under a separate agreement.
+    </p>
+
+    <!-- Section 5 -->
+    <h2>5. Formal Acceptance & Dual Sign-Off</h2>
+    <div class="sign-section">
+      <div class="sign-box">
+        <div class="sign-box-title">Client Acceptance (Thelagari)</div>
+        <div class="sign-row">Authorized Signatory: _________________________</div>
+        <div class="sign-row">Designation / Title: ___________________________</div>
+        <div class="sign-row">Signature: ___________________________________</div>
+        <div class="sign-row">Date: ________________________________________</div>
+        <div style="font-size: 10px; color: #6b7280; margin-top: 6px;">Acknowledges satisfaction and closeout of 120-day support.</div>
+      </div>
+      <div class="sign-box">
+        <div class="sign-box-title">Delivery Authorization (Engineering)</div>
+        <div class="sign-row">Lead Engineer / Agency: _______________________</div>
+        <div class="sign-row">Designation: Lead Full-Stack Architect</div>
+        <div class="sign-row">Signature: ___________________________________</div>
+        <div class="sign-row">Date: ________________________________________</div>
+        <div style="font-size: 10px; color: #6b7280; margin-top: 6px;">Certifies completion of all post-launch support commitments.</div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Thelagari (Lumina Commerce) — Official Post-Launch Warranty Closeout Document — Page 1 of 1
+    </div>
+  </div>
+
+</body>
+</html>
