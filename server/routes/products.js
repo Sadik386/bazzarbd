@@ -5,6 +5,7 @@ import { allowRoles } from "../middleware/rbac.js";
 import { logAdminAction } from "../utils/auditLogger.js";
 
 import Category from "../models/Category.js";
+import { upsertProductEmbedding, deleteProductEmbedding } from "../services/embeddingService.js";
 
 const router = Router();
 
@@ -243,6 +244,9 @@ router.post("/", adminAuth, allowRoles("SUPER_ADMIN", "CONTENT_MANAGER"), async 
     
     await logAdminAction(req, 'CREATE_PRODUCT', product._id, { name: product.name });
     
+    // Asynchronously synchronize embedding in pgvector
+    upsertProductEmbedding(product).catch((e) => console.error("[EmbeddingSync] Create error:", e.message));
+
     productsCache = null; // Invalidate cache
     slugCache.clear(); // Invalidate slug cache
     res.status(201).json(product);
@@ -278,6 +282,9 @@ router.put("/:id", adminAuth, allowRoles("SUPER_ADMIN", "CONTENT_MANAGER"), asyn
       
       await logAdminAction(req, 'UPDATE_PRODUCT', product._id, { name: product.name });
       
+      // Asynchronously synchronize embedding in pgvector
+      upsertProductEmbedding(product).catch((e) => console.error("[EmbeddingSync] Update error:", e.message));
+
       productsCache = null; // Invalidate cache
       slugCache.clear(); // Invalidate slug cache
       return res.json(product);
@@ -379,6 +386,9 @@ router.delete("/:id", adminAuth, allowRoles("SUPER_ADMIN"), async (req, res) => 
     
     await logAdminAction(req, 'DELETE_PRODUCT', product._id, { name: product.name });
     
+    // Purge embedding from pgvector
+    deleteProductEmbedding(req.params.id).catch((e) => console.error("[EmbeddingSync] Delete error:", e.message));
+
     productsCache = null; // Invalidate cache
     slugCache.clear(); // Invalidate slug cache
     res.json({ message: "Product deleted successfully" });

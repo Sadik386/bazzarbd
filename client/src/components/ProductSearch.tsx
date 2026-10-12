@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
-import { Search, X } from "lucide-react";
+import { Search, X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cloudinaryUrl } from "@/lib/cloudinary";
 
@@ -12,12 +12,14 @@ interface SearchResult {
   base_price: number;
   short_description: string | null;
   product_images: { url: string; alt_text: string | null; display_order: number | null }[];
+  similarity_score?: number;
 }
 
 const ProductSearch = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [useSemantic, setUseSemantic] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -49,16 +51,35 @@ const ProductSearch = ({ open, onClose }: { open: boolean; onClose: () => void }
     const timeout = setTimeout(async () => {
       setLoading(true);
       try {
-        const data = await api.get<{ products: SearchResult[] }>(`/products?search=${encodeURIComponent(query)}`);
-        setResults((data?.products || []).slice(0, 6));
+        if (useSemantic) {
+          // Query semantic search endpoint powered by pgvector
+          const data = await api.get<{ products: SearchResult[] }>(
+            `/search/semantic?q=${encodeURIComponent(query)}&limit=8`
+          );
+          setResults(data?.products || []);
+        } else {
+          // Standard text search fallback
+          const data = await api.get<{ products: SearchResult[] }>(
+            `/products?search=${encodeURIComponent(query)}`
+          );
+          setResults((data?.products || []).slice(0, 8));
+        }
       } catch {
-        setResults([]);
+        // Fallback to regular search on any error
+        try {
+          const fallback = await api.get<{ products: SearchResult[] }>(
+            `/products?search=${encodeURIComponent(query)}`
+          );
+          setResults((fallback?.products || []).slice(0, 8));
+        } catch {
+          setResults([]);
+        }
       }
       setLoading(false);
-    }, 250);
+    }, 280);
 
     return () => clearTimeout(timeout);
-  }, [query]);
+  }, [query, useSemantic]);
 
   const handleSelect = (slug: string) => {
     onClose();
@@ -75,7 +96,7 @@ const ProductSearch = ({ open, onClose }: { open: boolean; onClose: () => void }
           transition={{ duration: 0.2 }}
           className="fixed inset-0 bg-background/98 backdrop-blur-xl z-[200] flex flex-col"
         >
-          <div className="max-w-4xl mx-auto w-full px-4 md:px-6 pt-12 md:pt-24 flex flex-col h-full pb-8">
+          <div className="max-w-4xl mx-auto w-full px-4 md:px-6 pt-12 md:pt-20 flex flex-col h-full pb-8">
             {/* Search Input Area */}
             <div className="flex items-center gap-4 border-b border-border/30 pb-4 relative group">
               <Search className="w-6 h-6 md:w-8 md:h-8 text-muted-foreground/50 group-focus-within:text-primary transition-colors shrink-0" />
@@ -84,7 +105,7 @@ const ProductSearch = ({ open, onClose }: { open: boolean; onClose: () => void }
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search products..."
+                placeholder={useSemantic ? "Ask or search semantically (e.g. 'comfortable running shoes')..." : "Search products..."}
                 className="flex-grow bg-transparent text-foreground placeholder:text-muted-foreground/30 text-xl md:text-3xl font-light outline-none"
               />
               {query && (
@@ -104,20 +125,50 @@ const ProductSearch = ({ open, onClose }: { open: boolean; onClose: () => void }
               </button>
             </div>
 
+            {/* Toggle Semantic Mode */}
+            <div className="flex items-center justify-between pt-3 pb-1 text-xs">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setUseSemantic(!useSemantic)}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all ${
+                    useSemantic
+                      ? "bg-amber-500/15 text-amber-400 border-amber-500/40 shadow-sm"
+                      : "bg-white/5 text-neutral-400 border-white/10 hover:text-neutral-200"
+                  }`}
+                >
+                  <Sparkles className={`w-3.5 h-3.5 ${useSemantic ? "text-amber-400 animate-pulse" : "text-neutral-500"}`} />
+                  <span className="font-medium">
+                    {useSemantic ? "AI Semantic Search (pgvector ON)" : "Standard Search"}
+                  </span>
+                </button>
+                <span className="text-muted-foreground/50 text-[11px] hidden sm:inline">
+                  {useSemantic ? "Matches meaning and intent, not just exact keywords" : "Exact keyword matching"}
+                </span>
+              </div>
+              {results.length > 0 && (
+                <span className="text-muted-foreground text-[11px]">
+                  Found {results.length} item{results.length !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+
             {/* Search Results / Suggestion Container */}
-            <div className="flex-grow overflow-y-auto py-8">
+            <div className="flex-grow overflow-y-auto py-6">
               {query.trim() ? (
                 <div>
                   {loading && (
                     <div className="flex flex-col items-center justify-center py-20">
                       <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-                      <p className="text-sm text-muted-foreground animate-pulse">Searching the catalog...</p>
+                      <p className="text-sm text-muted-foreground animate-pulse">
+                        {useSemantic ? "Computing vector similarity with pgvector..." : "Searching the catalog..."}
+                      </p>
                     </div>
                   )}
                   {!loading && results.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
                       <p className="text-base md:text-lg font-medium text-foreground/70">No products found</p>
-                      <p className="text-xs md:text-sm text-muted-foreground mt-1">Try checking your spelling or search for something else</p>
+                      <p className="text-xs md:text-sm text-muted-foreground mt-1">Try describing what you need in natural language</p>
                     </div>
                   )}
                   {!loading && results.length > 0 && (
@@ -134,7 +185,14 @@ const ProductSearch = ({ open, onClose }: { open: boolean; onClose: () => void }
                           >
                             <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-card border border-border/30 overflow-hidden shrink-0 flex items-center justify-center">
                               {img ? (
-                                <img src={cloudinaryUrl(img.url)} alt={img.alt_text ?? product.name} width="64" height="64" loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 brightness-95" />
+                                <img
+                                  src={cloudinaryUrl(img.url)}
+                                  alt={img.alt_text ?? product.name}
+                                  width="64"
+                                  height="64"
+                                  loading="lazy"
+                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 brightness-95"
+                                />
                               ) : (
                                 <div className="w-full h-full bg-muted flex items-center justify-center">
                                   <Search className="w-5 h-5 text-muted-foreground/30" />
@@ -142,12 +200,23 @@ const ProductSearch = ({ open, onClose }: { open: boolean; onClose: () => void }
                               )}
                             </div>
                             <div className="flex-grow min-w-0">
-                              <p className="text-sm md:text-base font-semibold text-foreground/90 truncate group-hover:text-primary transition-colors text-left">{product.name}</p>
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-sm md:text-base font-semibold text-foreground/90 truncate group-hover:text-primary transition-colors text-left">
+                                  {product.name}
+                                </p>
+                                {product.similarity_score !== undefined && (
+                                  <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+                                    {(product.similarity_score * 100).toFixed(0)}% match
+                                  </span>
+                                )}
+                              </div>
                               {product.short_description && (
-                                <p className="text-xs text-muted-foreground truncate mt-0.5 font-light text-left">{product.short_description}</p>
+                                <p className="text-xs text-muted-foreground truncate mt-0.5 font-light text-left">
+                                  {product.short_description}
+                                </p>
                               )}
                               <p className="text-xs md:text-sm font-bold text-[#ff4d00] mt-1 text-left">
-                                ৳{product.base_price.toFixed(2)}
+                                ৳{product.base_price?.toFixed(2)}
                               </p>
                             </div>
                           </button>
@@ -157,11 +226,19 @@ const ProductSearch = ({ open, onClose }: { open: boolean; onClose: () => void }
                   )}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-16 md:py-24 opacity-60">
-                  <Search className="w-12 h-12 md:w-16 md:h-16 text-muted-foreground/20 mb-4 stroke-[1.2px]" />
-                  <p className="text-base md:text-lg font-light text-muted-foreground text-center">Type to search the store</p>
-                  <div className="flex flex-wrap items-center justify-center gap-2 mt-6 max-w-md">
-                    {["Jacket", "Hoodie", "Pants", "T-Shirt"].map((tag) => (
+                <div className="flex flex-col items-center justify-center py-16 md:py-24 opacity-75">
+                  <Sparkles className="w-12 h-12 md:w-16 md:h-16 text-amber-500/40 mb-4 stroke-[1.2px] animate-pulse" />
+                  <p className="text-base md:text-lg font-light text-muted-foreground text-center">
+                    Type naturally — our pgvector AI understands what you mean
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center gap-2 mt-6 max-w-lg">
+                    {[
+                      "Cozy winter jacket",
+                      "Formal black pants",
+                      "Breathable summer t-shirt",
+                      "Heavyweight hoodies",
+                      "Casual wear under 2000",
+                    ].map((tag) => (
                       <button
                         key={tag}
                         onClick={() => setQuery(tag)}

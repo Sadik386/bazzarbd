@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import ImageUpload from "./ImageUpload";
 import { toast } from "sonner";
-import { X, Plus, Save, ArrowLeft, ChevronDown } from "lucide-react";
+import { X, Plus, Save, ArrowLeft, ChevronDown, Sparkles, Loader2, Globe } from "lucide-react";
 import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Ruler } from "lucide-react";
@@ -127,6 +127,85 @@ const AdminProductForm = ({ product, onCancel, onSuccess }: AdminProductFormProp
   const [specsArray, setSpecsArray] = useState<{key: string, value: string}[]>(
     product?.tech_specs ? Object.entries(product.tech_specs).map(([k, v]) => ({ key: k, value: String(v) })) : []
   );
+
+  const [isAutoListingLoading, setIsAutoListingLoading] = useState(false);
+  const [aiListingData, setAiListingData] = useState<any>(null);
+  const [selectedLang, setSelectedLang] = useState<"en" | "bn">("en");
+
+  const handleAutoListWithAI = async () => {
+    if (!formData.product_images || formData.product_images.length === 0) {
+      toast.error("Please upload at least one product image first.");
+      return;
+    }
+
+    setIsAutoListingLoading(true);
+    try {
+      const primaryImageUrl = formData.product_images[0].url;
+      const res = await api.post<{ success: boolean; data: any }>("/ai/auto-list", {
+        imageUrl: primaryImageUrl,
+      });
+
+      if (res.data) {
+        const d = res.data;
+        setAiListingData(d);
+        setSelectedLang("en");
+
+        const generatedSlug = (d.name_en || "")
+          .toLowerCase()
+          .replace(/ /g, "-")
+          .replace(/[^\w-]+/g, "");
+
+        setFormData((prev) => ({
+          ...prev,
+          name: d.name_en || prev.name,
+          slug: prev.slug || generatedSlug,
+          short_description: d.short_description_en || prev.short_description,
+          long_description: d.long_description_en || prev.long_description,
+          base_price: prev.base_price > 0 ? prev.base_price : (d.suggested_price_bdt || 0),
+          activity: d.seo_tags && Array.isArray(d.seo_tags) ? d.seo_tags : prev.activity,
+        }));
+
+        // Try to match suggested category
+        if (d.suggested_category && categories.length > 0) {
+          const match = categories.find((c) =>
+            c.name.toLowerCase().includes(d.suggested_category.toLowerCase()) ||
+            d.suggested_category.toLowerCase().includes(c.name.toLowerCase())
+          );
+          if (match) {
+            setFormData((prev) => ({ ...prev, category_id: match.id || match._id }));
+          }
+        }
+
+        toast.success("✨ Product details generated from image with Gemini Vision!");
+      }
+    } catch (err: any) {
+      console.error("Auto-list error:", err);
+      toast.error(err.message || "Failed to generate details with Gemini Vision.");
+    } finally {
+      setIsAutoListingLoading(false);
+    }
+  };
+
+  const handleSwitchLanguage = (lang: "en" | "bn") => {
+    if (!aiListingData) return;
+    setSelectedLang(lang);
+    if (lang === "bn") {
+      setFormData((prev) => ({
+        ...prev,
+        name: aiListingData.name_bn || prev.name,
+        short_description: aiListingData.short_description_bn || prev.short_description,
+        long_description: aiListingData.long_description_bn || prev.long_description,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        name: aiListingData.name_en || prev.name,
+        short_description: aiListingData.short_description_en || prev.short_description,
+        long_description: aiListingData.long_description_en || prev.long_description,
+      }));
+    }
+    toast.info(`Switched to ${lang === "bn" ? "Bangla (বাংলা)" : "English"} details`);
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -468,6 +547,63 @@ const AdminProductForm = ({ product, onCancel, onSuccess }: AdminProductFormProp
                 onReorder={handleImageReorder}
                 maxImages={10}
               />
+
+              {/* ── Gemini Vision Auto-Fill Button ──────────────────────────────── */}
+              {formData.product_images.length > 0 && (
+                <div className="pt-2 border-t border-border/40 space-y-2">
+                  <Button
+                    type="button"
+                    onClick={handleAutoListWithAI}
+                    disabled={isAutoListingLoading}
+                    className="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-medium shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-2"
+                  >
+                    {isAutoListingLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Gemini Vision analyzing image...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-amber-200" />
+                        <span>✨ Auto-Fill Details with Gemini Vision</span>
+                      </>
+                    )}
+                  </Button>
+
+                  {aiListingData && (
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-card/60 border border-border/40 text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-primary" />
+                        Generated Language:
+                      </span>
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleSwitchLanguage("en")}
+                          className={`px-2.5 py-1 rounded text-[11px] font-medium transition-all ${
+                            selectedLang === "en"
+                              ? "bg-primary text-primary-foreground shadow-sm"
+                              : "bg-muted text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          English
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSwitchLanguage("bn")}
+                          className={`px-2.5 py-1 rounded text-[11px] font-medium transition-all ${
+                            selectedLang === "bn"
+                              ? "bg-primary text-primary-foreground shadow-sm"
+                              : "bg-muted text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          বাংলা
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 

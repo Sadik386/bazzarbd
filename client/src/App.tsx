@@ -16,6 +16,7 @@ import SmoothScroll from "./components/SmoothScroll";
 import ScrollToTop from "./components/ScrollToTop";
 import { api } from "@/lib/api";
 import Vacation from "@/pages/Vacation";
+import AiSalesmanWidget from "@/components/AiSalesmanWidget";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const AppContent = () => {
         <AnimatedRoutes />
       </main>
       <Footer />
+      {!isAdminRoute && <AiSalesmanWidget />}
     </>
   );
 };

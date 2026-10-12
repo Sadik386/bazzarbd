@@ -31,6 +31,10 @@ import notificationRoutes from "./routes/notifications.js";
 import jobRoutes from "./routes/jobs.js";
 import sitemapRoute from "./routes/sitemap.js";
 import imgProxyRoute from "./routes/imgProxy.js";
+import searchRoutes from "./routes/search.js";
+import aiChatRoutes from "./routes/aiChat.js";
+import aiListingRoutes from "./routes/aiListing.js";
+import { initPgVector } from "./db/postgres.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -41,6 +45,7 @@ app.use(compression({
   threshold: 1024,
   filter: (req, res) => {
     if (req.headers['x-no-compression']) return false;
+    if (res.getHeader('Content-Type') === 'text/event-stream') return false;
     return compression.filter(req, res);
   }
 }));
@@ -51,7 +56,17 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 app.use(cors({
-  origin: process.env.CLIENT_URL || "*",
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      origin.startsWith("http://localhost:") ||
+      origin.startsWith("http://127.0.0.1:") ||
+      (process.env.CLIENT_URL && origin === process.env.CLIENT_URL)
+    ) {
+      return callback(null, true);
+    }
+    return callback(new Error("CORS origin not allowed: " + origin), false);
+  },
   credentials: true
 }));
 app.use(cookieParser());
@@ -91,6 +106,9 @@ app.use("/api/support", supportRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/ai", aiChatRoutes);
+app.use("/api/ai", aiListingRoutes);
 
 // Dynamic product sitemap — served at /sitemap-products.xml
 app.use("/sitemap-products.xml", sitemapRoute);
@@ -150,7 +168,10 @@ app.use((err, req, res, next) => {
 });
 
 // Connect to database and start server
-connectDB().then(() => {
+connectDB().then(async () => {
+  // Initialize pgvector extension, table, and HNSW index in background
+  initPgVector().catch((err) => console.warn("⚠️ pgvector startup initialization notice:", err.message));
+
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ Server running on port ${PORT}`);
     console.log(`✅ Environment: ${process.env.NODE_ENV || "development"}`);
