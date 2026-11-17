@@ -7,5 +7,7 @@
 .stitch/
 server/.agents/
 server/uploads/
+__pycache__/
+*.py[cod]
 *_page_context_verified.png
 pipecat_*.png
