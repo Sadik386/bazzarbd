@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 
 const couponSchema = new mongoose.Schema({
   code: { type: String, required: true, unique: true, uppercase: true },

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 
 const questionSchema = new mongoose.Schema({
   product_id: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },

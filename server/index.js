@@ -1,3 +1,6 @@
+import http from "http";
+import { setupLiveVoiceBridge } from "./services/liveVoiceBridge.js";
+import { setupVoiceRoutes, ensurePipecatVoiceService } from "./services/pipecatManager.js";
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
@@ -34,6 +37,8 @@ import imgProxyRoute from "./routes/imgProxy.js";
 import searchRoutes from "./routes/search.js";
 import aiChatRoutes from "./routes/aiChat.js";
 import aiListingRoutes from "./routes/aiListing.js";
+import inventoryRoutes from "./routes/inventory.js";
+import recommendationRoutes from "./routes/recommendations.js";
 import { initPgVector } from "./db/postgres.js";
 
 const app = express();
@@ -93,10 +98,12 @@ app.use(auth);
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/recommendations", recommendationRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/admin/inventory", inventoryRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/settings", settingsRoutes);
@@ -108,6 +115,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/ai", aiChatRoutes);
+app.use("/api/ai-chat", aiChatRoutes);
 app.use("/api/ai", aiListingRoutes);
 
 // Dynamic product sitemap — served at /sitemap-products.xml
@@ -143,6 +151,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"), {
 
 
 
+// Pipecat Voice Service routes
+setupVoiceRoutes(app);
+
 // Health check
 app.get("/api/health", (req, res) => {
   res.json({
@@ -172,7 +183,13 @@ connectDB().then(async () => {
   // Initialize pgvector extension, table, and HNSW index in background
   initPgVector().catch((err) => console.warn("⚠️ pgvector startup initialization notice:", err.message));
 
-  app.listen(PORT, "0.0.0.0", () => {
+  // Boot Pipecat Voice Service in background
+  ensurePipecatVoiceService().catch((err) => console.warn("⚠️ Pipecat supervisor warning:", err.message));
+
+  const server = http.createServer(app);
+  setupLiveVoiceBridge(server);
+
+  server.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ Server running on port ${PORT}`);
     console.log(`✅ Environment: ${process.env.NODE_ENV || "development"}`);
   });

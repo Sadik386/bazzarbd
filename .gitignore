@@ -1,0 +1,11 @@
+.vercel
+.env*
+
+# Local tooling and runtime artifacts
+.agents/
+.playwright-mcp/
+.stitch/
+server/.agents/
+server/uploads/
+*_page_context_verified.png
+pipecat_*.png

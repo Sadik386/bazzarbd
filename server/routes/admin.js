@@ -1,5 +1,5 @@
 import { Router } from "express";
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 import Order from "../models/Order.js";
 import User from "../models/User.js";
 import Product from "../models/Product.js";
@@ -71,6 +71,67 @@ router.get("/stats", async (req, res) => {
       },
       ordersByStatus,
       lowStockProducts
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin Analytics Overview (for AdminAnalytics.tsx)
+router.get("/analytics", async (req, res) => {
+  try {
+    const totalOrders = await Order.countDocuments();
+    const completedOrders = await Order.countDocuments({ status: "delivered" });
+    const dispatchedOrders = await Order.countDocuments({ status: { $in: ["shipped", "delivered"] } });
+    const dispatchRate = totalOrders > 0 ? Math.round((dispatchedOrders / totalOrders) * 100) : 100;
+
+    // Total gross revenue
+    const revenueResult = await Order.aggregate([
+      { $match: { status: { $ne: "cancelled" } } },
+      { $group: { _id: null, total: { $sum: "$total_amount" } } }
+    ]);
+    const totalRevenue = revenueResult[0]?.total || 0;
+
+    // Unique visitors
+    const totalVisitors = await Visit.countDocuments();
+
+    // 7-day revenue chart
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const dailyRevenue = await Order.aggregate([
+      { $match: { createdAt: { $gte: sevenDaysAgo }, status: { $ne: "cancelled" } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%b %d", date: "$createdAt" } },
+          amount: { $sum: "$total_amount" },
+          rawDate: { $min: "$createdAt" }
+        }
+      },
+      { $sort: { rawDate: 1 } }
+    ]);
+
+    // Build continuous 7-day series
+    const chartMap = new Map(dailyRevenue.map(d => [d._id, d.amount]));
+    const revenueChart = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateKey = d.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
+      revenueChart.push({
+        date: dateKey,
+        amount: chartMap.get(dateKey) || 0
+      });
+    }
+
+    res.json({
+      totalRevenue,
+      totalOrders,
+      completedOrders,
+      dispatchRate,
+      uniqueVisitors: totalVisitors || 1,
+      revenueChart
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

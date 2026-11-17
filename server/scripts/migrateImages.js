@@ -20,7 +20,7 @@ import path from "path";
 import https from "https";
 import http from "http";
 import { fileURLToPath } from "url";
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 const __filename = fileURLToPath(import.meta.url);

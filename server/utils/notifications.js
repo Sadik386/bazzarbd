@@ -2,7 +2,7 @@ import axios from 'axios';
 import { generateInvoicePDF } from './invoiceGenerator.js';
 import Settings from '../models/Settings.js';
 import { sendEmail } from './emailService.js';
-import mongoose from 'mongoose';
+import mongoose from '../db/mongoCompat.js';
 
 /**
  * Sends SMS notification using a generic API

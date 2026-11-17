@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 
 const settingsSchema = new mongoose.Schema({
   key: { type: String, required: true, unique: true },

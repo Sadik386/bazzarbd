@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 
 const orderItemSchema = new mongoose.Schema({
   product_id: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
@@ -31,5 +31,7 @@ const orderSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 orderSchema.index({ user_id: 1 });
+orderSchema.index({ status: 1, createdAt: -1 });
+orderSchema.index({ "order_items.product_id": 1, status: 1, createdAt: -1 });
 
 export default mongoose.model("Order", orderSchema);

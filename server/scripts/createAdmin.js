@@ -4,7 +4,7 @@ import path from "path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, "..", ".env") });
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 import User from "../models/User.js";
 
 const ADMIN_EMAIL = "admin@thelagari.com";

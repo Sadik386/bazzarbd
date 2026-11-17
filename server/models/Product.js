@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 
 const variantSchema = new mongoose.Schema({
   variant_name: { type: String, required: true },
@@ -21,6 +21,19 @@ const productSchema = new mongoose.Schema({
   traditional_price: { type: Number },
   short_description: String,
   long_description: String,
+  name_bn: String,
+  short_description_bn: String,
+  long_description_bn: String,
+  highlights: [String],
+  seo: {
+    meta_title: String,
+    meta_description: String,
+    tags: [String],
+  },
+  social_copy: {
+    facebook_post: String,
+    ad_copy: String,
+  },
   tech_specs: { type: mongoose.Schema.Types.Mixed, default: {} },
   is_featured: { type: Boolean, default: false },
   is_recommended: { type: Boolean, default: false },

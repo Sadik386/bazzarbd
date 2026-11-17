@@ -1,5 +1,5 @@
 import { Router } from "express";
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import { requireAuth } from "../middleware/auth.js";

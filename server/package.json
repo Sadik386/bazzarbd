@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "node --watch index.js",
     "start": "node index.js",
+    "db:init": "node -e 'import(\"./db/initDb.js\").then(m => m.initPostgresTables()).then(() => process.exit(0))'",
+    "migrate:mongo-to-pg": "node scripts/migrateMongoToPg.js",
     "seed": "node seed.js",
     "test-cloudinary": "node test-cloudinary.js",
     "migrate:images": "node scripts/migrateImages.js",
@@ -46,6 +48,7 @@
     "pdfkit": "^0.18.0",
     "pg": "^8.23.1",
     "pgvector": "^0.3.0",
-    "resend": "^6.12.3"
+    "resend": "^6.12.3",
+    "ws": "^8.22.0"
   }
 }

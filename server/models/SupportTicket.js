@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 
 const supportTicketSchema = new mongoose.Schema({
   name: { type: String, required: true },

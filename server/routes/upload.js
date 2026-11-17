@@ -5,7 +5,7 @@ import { auth } from "../middleware/auth.js";
 const router = express.Router();
 
 // ── Upload single image ───────────────────────────────────────────────────────
-router.post("/upload", (req, res) => {
+router.post(["/", "/upload"], (req, res) => {
   upload.single("image")(req, res, (err) => {
     if (err) {
       console.error("Multer/Upload error:", err);
@@ -23,6 +23,7 @@ router.post("/upload", (req, res) => {
 
       res.json({
         success: true,
+        url,
         image: {
           url,
           public_id: req.file.filename,
@@ -40,7 +41,7 @@ router.post("/upload", (req, res) => {
 });
 
 // ── Upload multiple images ────────────────────────────────────────────────────
-router.post("/upload-multiple", upload.array("images", 10), (req, res) => {
+router.post(["/multiple", "/upload-multiple"], upload.array("images", 10), (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: "No image files provided" });

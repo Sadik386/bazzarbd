@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 
 const visitSchema = new mongoose.Schema({
   ip_address: { type: String, required: true },

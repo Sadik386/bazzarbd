@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../db/mongoCompat.js";
 
 const sizeRowSchema = new mongoose.Schema({
   size: { type: String, required: true },       // e.g. "M", "L", "XL", "2XL"
